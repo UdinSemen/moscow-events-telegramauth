@@ -3,8 +3,8 @@ package redis
 import (
 	"context"
 	"fmt"
-	"moscow-events-telegramauth/internal/config"
 
+	"github.com/UdinSemen/moscow-events-telegramauth/internal/config"
 	"github.com/redis/go-redis/v9"
 )
 

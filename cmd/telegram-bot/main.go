@@ -1,9 +1,8 @@
 package main
 
 import (
-	"moscow-events-telegramauth/internal/config"
-	"moscow-events-telegramauth/internal/utils"
-
+	"github.com/UdinSemen/moscow-events-telegramauth/internal/config"
+	"github.com/UdinSemen/moscow-events-telegramauth/internal/utils"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )

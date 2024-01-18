@@ -1,8 +1,7 @@
 package telegram
 
 import (
-	"moscow-events-telegramauth/internal/bot/consts"
-
+	"github.com/UdinSemen/moscow-events-telegramauth/internal/bot/consts"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 

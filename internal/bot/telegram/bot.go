@@ -2,10 +2,10 @@ package telegram
 
 import (
 	"fmt"
-	"moscow-events-telegramauth/internal/bot/consts"
-	"moscow-events-telegramauth/internal/config"
-	"moscow-events-telegramauth/internal/storage"
 
+	"github.com/UdinSemen/moscow-events-telegramauth/internal/bot/consts"
+	"github.com/UdinSemen/moscow-events-telegramauth/internal/config"
+	"github.com/UdinSemen/moscow-events-telegramauth/internal/storage"
 	"github.com/go-telegram-bot-api/telegram-bot-api/v5"
 
 	"go.uber.org/zap"
