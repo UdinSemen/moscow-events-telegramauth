@@ -1,0 +1,16 @@
+env: "local"
+telegram_bot:
+  token: "5935744231:AAF6fmWqgUcc5x6XAAZEDaiGwRHtnv_uBNQ"
+  time_out: 60
+postgres:
+  host: "localhost"
+  port: 5432
+  user: "postgres"
+  password: "root"
+  db_name: "IntoMotionTelegramBotDev"
+  ssl_mode: "disable"
+redis:
+  host: "localhost"
+  port: "6379"
+  password: "qwerty"
+  db-name: 0
