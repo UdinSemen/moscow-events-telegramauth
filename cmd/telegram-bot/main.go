@@ -1,7 +1,12 @@
 package main
 
 import (
+	"context"
+
+	"github.com/UdinSemen/moscow-events-telegramauth/internal/bot/telegram"
 	"github.com/UdinSemen/moscow-events-telegramauth/internal/config"
+	pg_storage "github.com/UdinSemen/moscow-events-telegramauth/internal/storage/pg-storage"
+	"github.com/UdinSemen/moscow-events-telegramauth/internal/storage/redis"
 	"github.com/UdinSemen/moscow-events-telegramauth/internal/utils"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -35,4 +40,20 @@ func main() {
 		panic(err)
 	}
 	zap.ReplaceGlobals(logger)
+
+	redisStorage := redis.NewRedisClient(cfg)
+	if err := redisStorage.Ping(context.Background()); err != nil {
+		zap.S().Fatal(err.Error())
+	}
+	postgresStorage, err := pg_storage.InitPgStorage(cfg)
+	if err := postgresStorage.Ping(); err != nil {
+		zap.S().Fatalf(err.Error())
+	}
+
+	bot, err := telegram.InitBot(cfg, redisStorage, postgresStorage, false)
+	if err != nil {
+		zap.S().Fatal(err.Error())
+	}
+
+	bot.Start()
 }

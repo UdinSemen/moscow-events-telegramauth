@@ -14,14 +14,14 @@ import (
 type Bot struct {
 	bot          *tgbotapi.BotAPI
 	redisStorage storage.RedisStorage
-	logger       *zap.SugaredLogger
+	pgStorage    storage.PgStorage
 	timeOut      int
 }
 
 func InitBot(
 	cfg *config.Config,
 	redisStorage storage.RedisStorage,
-	logger *zap.SugaredLogger,
+	pgStorage storage.PgStorage,
 	debug bool) (*Bot, error) {
 	const op = "bot.InitBot"
 
@@ -33,11 +33,11 @@ func InitBot(
 	tgBot := Bot{
 		bot:          bot,
 		redisStorage: redisStorage,
-		logger:       logger,
+		pgStorage:    pgStorage,
 		timeOut:      cfg.TelegramBot.TimeOut,
 	}
 	bot.Debug = debug
-	logger.Infof("Authorized on account %s", bot.Self.UserName)
+	zap.S().Infof("Authorized on account %s", bot.Self.UserName)
 	return &tgBot, nil
 }
 
@@ -55,10 +55,10 @@ func (b *Bot) handleUpdate(upd tgbotapi.Update) {
 
 	mes := upd.Message
 	if upd.CallbackQuery != nil {
-		b.logger.Debug(upd.CallbackQuery)
+		zap.S().Debug(upd.CallbackQuery)
 	}
 	if mes != nil {
-		b.logger.Debug(mes.Text)
+		zap.S().Debug(mes.Text)
 		if mes.IsCommand() {
 			b.HandleCommand(upd)
 		}
