@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/UdinSemen/moscow-events-telegramauth/internal/bot/consts"
+	pg_storage "github.com/UdinSemen/moscow-events-telegramauth/internal/storage/pg-storage"
 	"github.com/UdinSemen/moscow-events-telegramauth/internal/storage/redis"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"go.uber.org/zap"
@@ -45,6 +46,23 @@ func (b *Bot) handleTimeCode(upd tgbotapi.Update) {
 		}
 	}
 
+	firstName := upd.Message.From.FirstName
+	lastName := upd.Message.From.LastName
+	userID := upd.Message.From.ID
+
+	flagHaveUser := false
+	if err := b.pgStorage.AddUser(firstName, lastName, "", userID); err != nil {
+		if errors.Is(err, pg_storage.ErrPgUniqueConstr) {
+			flagHaveUser = true
+		} else {
+			zap.S().Errorf("%s:%s", op, err)
+			if err := b.sentSmtWrongWithReq(chatID); err != nil {
+				zap.S().Errorf("%s:%s", op, err)
+			}
+			return
+		}
+	}
+
 	if err := b.redisStorage.ConfirmSession(context.Background(), timeCode,
 		strconv.FormatInt(upd.Message.Chat.ID, 10)); err != nil {
 		zap.S().Error(fmt.Errorf("%s:%w", op, err))
@@ -70,17 +88,12 @@ func (b *Bot) handleTimeCode(upd tgbotapi.Update) {
 		return
 	}
 
-	firstName := upd.Message.From.FirstName
-	lastName := upd.Message.From.LastName
-	userID := upd.Message.From.ID
-
-	if err := b.pgStorage.AddUser(firstName, lastName, "", userID); err != nil {
-		if err := b.sentSmtWrongWithReq(chatID); err != nil {
-			zap.S().Errorf("%s:%s", op, err)
-		}
+	textMsg := consts.TextConfirmed
+	if flagHaveUser {
+		textMsg = consts.TextAlreadyHaveUser
 	}
 
-	send := tgbotapi.NewMessage(chatID, consts.TextConfirmed)
+	send := tgbotapi.NewMessage(chatID, textMsg)
 	if _, err := b.bot.Send(send); err != nil {
 		zap.S().Errorf("%s:%s", op, err)
 		return

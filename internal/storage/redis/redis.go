@@ -56,9 +56,11 @@ func (s *Redis) ConfirmSession(ctx context.Context, timeCode, userID string) err
 		}
 		return fmt.Errorf("%s:%w", op, err)
 	}
+	zap.S().Debug(res)
 
 	var session models.RegSession
 	if err := json.Unmarshal([]byte(res), &session); err != nil {
+		zap.S().Debug(res)
 		return fmt.Errorf("%s:%w", op, err)
 	}
 	if session.IsConfirmed {

@@ -1,11 +1,20 @@
 package pg_storage
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/UdinSemen/moscow-events-telegramauth/internal/config"
 	"github.com/jmoiron/sqlx"
-	_ "github.com/lib/pq"
+	"github.com/lib/pq"
+)
+
+const (
+	ErrPgUniqueConstrCode = "23505"
+)
+
+var (
+	ErrPgUniqueConstr = errors.New("err postgres unique constraint")
 )
 
 type PgStorage struct {
@@ -42,7 +51,11 @@ func (s *PgStorage) AddUser(firstName, lastName, sex string, userID int64) error
 		"last_name":  lastName,
 		"sex":        sex,
 	})
+
 	if err != nil {
+		if err.(*pq.Error).Code == ErrPgUniqueConstrCode {
+			return fmt.Errorf("%s: %w", op, ErrPgUniqueConstr)
+		}
 		return fmt.Errorf("%s: %w", op, err)
 	}
 
